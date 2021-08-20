@@ -1,23 +1,35 @@
-import logo from './logo.svg';
 import './App.css';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
+import NewsContent from './components/NewsContent';
+import NavDrawer from './components/NavDrawer';
+import apiToken from './data/secrets';
 
 function App() {
+  const [newsArray, setNewsArray] = useState([]);
+  const [topic, setTopic] = useState("breaking-news")
+
+  const newsApi = async () => {
+    try {
+      const news = await axios.get(
+        `https://gnews.io/api/v4/top-headlines?&token=${apiToken}&lang=en&topic=${topic}`
+      );
+      // console.log(news.data);
+      setNewsArray(news.data.articles);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    newsApi();
+    // eslint-disable-next-line
+  }, [topic]);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <NavDrawer setTopic={setTopic} />
+      <NewsContent newsArray={newsArray} />
     </div>
   );
 }
